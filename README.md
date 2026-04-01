@@ -1,8 +1,8 @@
-<h1>Finance Dashboard Backend (RBAC + Analytics)</h1>
+<h1>Finance Dashboard Backend</h1>
 
 <h2>Overview</h2>
 <p>
-This project is a production-style backend system for a Finance Dashboard that manages user authentication,
+This project implements a backend system for a Finance Dashboard that manages user authentication,
 role-based access control, financial records, and analytics.
 </p>
 
@@ -19,6 +19,7 @@ The system is designed with a strong focus on clean architecture, scalability, a
   <li>Authentication: JWT (JSON Web Tokens)</li>
   <li>Security: bcrypt, helmet, rate limiting</li>
   <li>Architecture: MVC (Model-View-Controller)</li>
+  <li>UI : NextJS</li>
 </ul>
 
 <hr />
