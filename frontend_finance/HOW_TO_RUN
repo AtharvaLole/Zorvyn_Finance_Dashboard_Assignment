@@ -1,0 +1,12 @@
+//BACKEND
+1. Clone Backend folder, run "npm init -y" to install all deps
+2. initiate "node server.js"
+3. backend starts to run LOCALLY (PORT:5000)
+4. already backend is deployed on RENDER for easy demo
+
+//FRONTEND
+1. Clone Frontend folder, run "npm install" to install all deps
+2. initiate "npm run dev"
+3. frontend runs LOCALLY (PORT:3000)
+
+//TO RUN THIS PROJECT LOCALLY, YOU NEED TO CHANGE THE BASE URL TO LOCALHOST:5000 
