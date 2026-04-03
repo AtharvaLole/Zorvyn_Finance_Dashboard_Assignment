@@ -1,0 +1,3 @@
+As the backend is deployed on a free plan on render, it takes 50-60 seconds of activation time for the first request
+again after 15minutes of inactivity it sleeps 
+hence to wake up the service for the first time a delay of 50-60 seconds is expected
