@@ -135,7 +135,11 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="overflow-x-auto">
-                <RecordTable records={records} />
+                <RecordTable 
+                  records={records} 
+                  userRole={user.role} 
+                  refresh={fetchData} 
+                />
               </div>
             </div>
           </div>

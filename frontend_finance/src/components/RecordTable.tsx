@@ -1,4 +1,8 @@
-export default function RecordTable({ records }: any) {
+"use client";
+
+import API from "@/lib/api";
+
+export default function RecordTable({ records, userRole, refresh }: any) {
   if (!records || records.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-slate-200">
@@ -17,12 +21,44 @@ export default function RecordTable({ records }: any) {
 
   const getTypeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'income':
-        return 'bg-green-100 text-green-800';
-      case 'expense':
-        return 'bg-red-100 text-red-800';
+      case "income":
+        return "bg-green-100 text-green-800";
+      case "expense":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-blue-100 text-blue-800';
+        return "bg-blue-100 text-blue-800";
+    }
+  };
+
+  // 🔴 DELETE
+  const handleDelete = async (id: string) => {
+    const confirmDelete = confirm("Are you sure you want to delete this record?");
+    if (!confirmDelete) return;
+
+    try {
+      await API.delete(`/records/${id}`);
+      refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete record");
+    }
+  };
+
+  // ✏️ EDIT (simple version)
+  const handleEdit = async (record: any) => {
+    const newAmount = prompt("Enter new amount", record.amount);
+
+    if (!newAmount) return;
+
+    try {
+      await API.put(`/records/${record._id}`, {
+        ...record,
+        amount: Number(newAmount),
+      });
+      refresh();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update record");
     }
   };
 
@@ -32,68 +68,83 @@ export default function RecordTable({ records }: any) {
         <table className="w-full">
           <thead className="bg-gradient-to-r from-slate-50 to-white border-b-2 border-slate-200">
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Amount
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Type
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase tracking-wider">
-                Date
-              </th>
+              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase">Amount</th>
+              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase">Type</th>
+              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase">Category</th>
+              <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase">Date</th>
+
+              {/* 🔥 NEW COLUMN */}
+              {userRole === "admin" && (
+                <th className="px-6 py-4 text-left text-sm font-bold text-slate-900 uppercase">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
+
           <tbody className="divide-y divide-slate-200">
             {records.map((r: any, index: number) => (
-              <tr 
-                key={r._id} 
-                className={`hover:bg-slate-50 transition-colors duration-150 ${
-                  index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'
+              <tr
+                key={r._id}
+                className={`hover:bg-slate-50 ${
+                  index % 2 === 0 ? "bg-white" : "bg-slate-50/50"
                 }`}
               >
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   <span className="text-lg font-bold text-slate-900">
                     ₹{r.amount.toLocaleString()}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-3 py-1 rounded-full text-sm font-bold ${getTypeColor(r.type)}`}>
+
+                <td className="px-6 py-4">
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTypeColor(r.type)}`}>
                     {r.type}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-slate-800 font-semibold">
-                    {r.category}
-                  </span>
+
+                <td className="px-6 py-4 text-slate-800 font-semibold">
+                  {r.category}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-slate-800 font-medium">
-                    {new Date(r.date).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
-                  </span>
+
+                <td className="px-6 py-4 text-slate-800 font-medium">
+                  {new Date(r.date).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </td>
+
+                {/* 🔥 ACTION BUTTONS */}
+                {userRole === "admin" && (
+                  <td className="px-6 py-4">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleEdit(r)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(r._id)}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      
-      {/* Table Footer with Record Count */}
-      <div className="px-6 py-3 bg-gradient-to-r from-slate-50 to-white border-t border-slate-200">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-slate-800">
-            Total Records: <span className="text-blue-700 font-bold">{records.length}</span>
-          </p>
-          <p className="text-sm font-medium text-slate-800">
-            Showing {records.length} {records.length === 1 ? 'record' : 'records'}
-          </p>
-        </div>
+
+      {/* Footer */}
+      <div className="px-6 py-3 bg-slate-50 border-t">
+        <p className="text-sm font-semibold text-slate-800">
+          Total Records: <span className="text-blue-700">{records.length}</span>
+        </p>
       </div>
     </div>
   );
