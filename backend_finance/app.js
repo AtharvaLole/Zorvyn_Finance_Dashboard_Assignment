@@ -8,9 +8,15 @@ const errorHandler = require("./middleware/error.middleware");
 
 const app = express();
 
-// Security
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+
+app.options("*", cors());
+
 app.use(express.json());
 app.use(morgan("dev"));
 
